@@ -1,5 +1,19 @@
 import { FastifyInstance } from 'fastify';
 import { getMongoDb } from '../../database/mongodb';
+import {Collection, ObjectId} from "mongodb";
+
+// Определяем интерфейс для документа чата
+interface ChatDocument {
+    _id: ObjectId;
+    participants: number[]; // Список участников чата
+    messages: {
+        senderId: number;
+        content: string;
+        messageType: string;
+        createdAt: Date;
+    }[]; // Сообщения в чате
+}
+
 
 export async function sendMessage(server: FastifyInstance) {
     server.post<{
@@ -21,11 +35,17 @@ export async function sendMessage(server: FastifyInstance) {
             const { userId } = request.user as { userId: number; username: string };
 
             // Находим чат
-            const chatCollection = getMongoDb().collection('chats');
-            const chat = await chatCollection.findOne({ _id: chatId });
+            // Получаем коллекцию чатов с типизацией
+            const chatCollection: Collection<ChatDocument> = getMongoDb().collection<ChatDocument>('chats');
+            // Находим чат по идентификатору
+            const chat = await chatCollection.findOne({ _id: new ObjectId(chatId) });
 
             if (!chat || !chat.participants.includes(userId)) {
                 return reply.status(404).send({ error: 'Chat not found' });
+            }
+
+            if (!chat.participants.includes(userId)) {
+                return reply.status(403).send({ error: 'You are not a participant in this chat' });
             }
 
             // Добавляем сообщение в чат
