@@ -72,10 +72,10 @@
    ```
 2. Установите зависимости
     ```bash
-       cd messenger/client
-       npm install # для frontend
-       cd messenger/server
-       npm install # для backend
+    cd messenger/client
+    npm install # для frontend
+    cd messenger/server
+    npm install # для backend
     ```
 
 ### Запуск
