@@ -1,6 +1,5 @@
 import {pgpool} from "../database/postgresql";
 import bcrypt from "bcrypt";
-import {server} from "../index";
 import {FastifyInstance} from "fastify";
 
 export async function login(server: FastifyInstance){

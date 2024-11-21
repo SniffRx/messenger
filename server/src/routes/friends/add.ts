@@ -1,4 +1,3 @@
-import { server } from "../../index";
 import { pgpool } from "../../database/postgresql";
 import {FastifyInstance} from "fastify";
 
