@@ -12,7 +12,7 @@ export const pgpool = new Pool({
 // Логирование успешного подключения
 pgpool.connect()
     .then(client => {
-        console.log('Connected to PostgreSQL');
+        console.log('Connected to PostgreSQL'.green);
         client.release(); // Освобождение соединения обратно в пул
     })
-    .catch(err => console.error('Connection error', err.stack));
+    .catch(err => console.error(`Connection error ${err.stack}`.red));

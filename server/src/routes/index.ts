@@ -6,6 +6,7 @@ import {login} from "./login";
 import {register} from "./register";
 import {confirmFriend} from "./friends/confirm";
 import {createChat} from "./chats/create";
+import websocketRoutes from "./websocket";
 
 export async function registerRoutes(server: FastifyInstance) {
     await login(server);
@@ -15,4 +16,5 @@ export async function registerRoutes(server: FastifyInstance) {
     await removeFriends(server);
     await confirmFriend(server);
     await createChat(server);
+    await websocketRoutes(server);
 }
