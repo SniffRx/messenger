@@ -46,7 +46,7 @@ server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyRe
 registerRoutes(server);
 
 
-server.listen({port:Number(process.env.PORT ?? 3000)}, (err, address) => {
+server.listen({host: process.env.ADDRESS ?? "0.0.0.0", port: Number(process.env.PORT ?? 3000)}, (err, address) => {
     if (err) {
         console.error(`${err}`.red);
         process.exit(1);
