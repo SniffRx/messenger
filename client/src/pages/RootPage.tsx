@@ -10,7 +10,8 @@ import {
     ListItem,
     ListItemButton,
     ListItemIcon,
-    ListItemText, TextField,
+    ListItemText,
+    TextField,
     Toolbar,
     Typography,
     useTheme
@@ -23,49 +24,39 @@ export function RootPage() {
     const dummyList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     const theme = useTheme()
 
-    const [chatListWidth, setChatListWidth] = useState(300); // Default width in pixels
-    const [isResizing, setIsResizing] = useState(false);
-    const [startMouseX, setStartMouseX] = useState(0); // Initial mouse X position
-    const [startWidth, setStartWidth] = useState(0); // Initial width of the chat list
+    const [chatListWidth, setChatListWidth] = useState(300)
+    const [isResizing, setIsResizing] = useState(false)
+    const [startMouseX, setStartMouseX] = useState(0)
+    const [startWidth, setStartWidth] = useState(0)
 
     const handleMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
-        e.preventDefault(); // Prevents text selection during resizing
-        setIsResizing(true);
-        setStartMouseX(e.clientX);
-        setStartWidth(chatListWidth);
+        e.preventDefault()
+        setIsResizing(true)
+        setStartMouseX(e.clientX)
+        setStartWidth(chatListWidth)
 
-        // Add global event listeners
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-    };
+        window.addEventListener("mousemove", handleMouseMove)
+        window.addEventListener("mouseup", handleMouseUp)
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
-        if (!isResizing) return;
+        if (!isResizing) return
 
-        const delta = e.clientX - startMouseX;
-        const newWidth = Math.min(Math.max(startWidth + delta, 200), 400); // Keep width within min/max
-        setChatListWidth(newWidth);
-    };
+        const delta = e.clientX - startMouseX
+        const newWidth = Math.min(Math.max(startWidth + delta, 200), 400)
+        setChatListWidth(newWidth)
+    }
 
     const handleMouseUp = () => {
         if (isResizing) {
-            setIsResizing(false);
+            setIsResizing(false)
 
-            // Clean up event listeners
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove)
+            window.removeEventListener("mouseup", handleMouseUp)
         }
-    };
+    }
 
     useEffect(() => {
-        const handleMouseMove = (e: MouseEvent) => {
-            if (isResizing) {
-                const delta = e.clientX - startMouseX
-                const newWidth = Math.max(200, Math.min(startWidth + delta, 400))
-                setChatListWidth(newWidth)
-            }
-        };
-
         if (isResizing) {
             window.addEventListener("mousemove", handleMouseMove)
             window.addEventListener("mouseup", handleMouseUp)
@@ -76,7 +67,7 @@ export function RootPage() {
         return () => {
             window.removeEventListener("mousemove", handleMouseMove)
             window.removeEventListener("mouseup", handleMouseUp)
-        };
+        }
     }, [isResizing, startMouseX, startWidth])
 
 
@@ -89,8 +80,7 @@ export function RootPage() {
                 overflow: "hidden",
             }}
         >
-            <CssBaseline />
-            {/* Left Drawer */}
+            <CssBaseline/>
             <Drawer
                 variant="permanent"
                 sx={{
@@ -104,13 +94,12 @@ export function RootPage() {
                     },
                 }}
             >
-                <Toolbar sx={{ justifyContent: "center" }}>
+                <Toolbar sx={{justifyContent: "center"}}>
                     <IconButton color="inherit">
-                        <Menu fontSize="large" />
+                        <Menu fontSize="large"/>
                     </IconButton>
                 </Toolbar>
-                {/* Divider for Drawer */}
-                <Divider sx={{ height: "1px" }} />
+                <Divider sx={{height: "1px"}}/>
                 <List>
                     {dummyList.map((value) => (
                         <ListItem disablePadding key={value}>
@@ -121,11 +110,11 @@ export function RootPage() {
                                     flexWrap: "wrap",
                                 }}
                             >
-                                <ListItemIcon sx={{ justifyContent: "center" }}>
-                                    <Folder fontSize="large" />
+                                <ListItemIcon sx={{justifyContent: "center"}}>
+                                    <Folder fontSize="large"/>
                                 </ListItemIcon>
                                 <ListItemText
-                                    sx={{ textAlign: "center" }}
+                                    sx={{textAlign: "center"}}
                                 >
                                     Folder {value}
                                 </ListItemText>
@@ -135,7 +124,6 @@ export function RootPage() {
                 </List>
             </Drawer>
 
-            {/* Chat List */}
             <Box
                 sx={{
                     width: chatListWidth,
@@ -152,24 +140,22 @@ export function RootPage() {
                         fullWidth
                         freeSolo
                         options={dummyList.map((option) => option)}
-                        renderInput={(params) => (
-                            <TextField {...params} variant="outlined" label="Search" size="small" />
-                        )}
+                        renderInput={(params) =>
+                            <TextField {...params} variant="outlined" label="Search" size="small"/>}
                     />
                 </Toolbar>
-                {/* Divider for Chat */}
                 <Divider
                     sx={{
-                        height: "1px", // Explicitly define height
-                        backgroundColor: theme.palette.divider, // Match theme divider
+                        height: "1px",
+                        backgroundColor: theme.palette.divider,
                         position: "relative",
                     }}
                 />
                 <List>
-                    {dummyList.map((value, index) => (
+                    {dummyList.map((value, index) =>
                         <ListItem key={index} disablePadding>
                             <ListItemButton>
-                                <Avatar sx={{ marginRight: 2 }}>C</Avatar>
+                                <Avatar sx={{marginRight: 2}}>C</Avatar>
                                 <ListItemText
                                     primaryTypographyProps={{
                                         sx: {
@@ -195,11 +181,9 @@ export function RootPage() {
                                     10:00PM
                                 </Typography>
                             </ListItemButton>
-                        </ListItem>
-                    ))}
+                        </ListItem>)}
                 </List>
 
-                {/* Resizable Divider */}
                 <Box
                     onMouseDown={handleMouseDown}
                     sx={{
@@ -215,7 +199,6 @@ export function RootPage() {
                 />
             </Box>
 
-            {/* Main Content */}
             <Box
                 component="main"
                 sx={{
@@ -224,7 +207,7 @@ export function RootPage() {
                     overflowY: "auto",
                 }}
             >
-                <Typography sx={{ marginBottom: 2 }}>I'm trash :D</Typography>
+                <Typography sx={{marginBottom: 2}}>I'm trash :D</Typography>
                 <img
                     alt="trash"
                     src="http://www.quickmeme.com/img/c4/c4117905ec08b0df9aaf8c4a19433f31e1b62ea8f6d1680ccd2c3449ac9141bf.jpg"
