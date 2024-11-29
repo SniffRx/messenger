@@ -1,4 +1,5 @@
 import {
+    Autocomplete,
     Avatar,
     Box,
     CssBaseline,
@@ -8,51 +9,226 @@ import {
     List,
     ListItem,
     ListItemButton,
-    ListItemText,
+    ListItemIcon,
+    ListItemText, TextField,
     Toolbar,
     Typography,
     useTheme
 } from "@mui/material";
-import {Menu} from "@mui/icons-material";
+import {Folder, Menu} from "@mui/icons-material";
+import {MouseEventHandler, useEffect, useState} from "react";
 
 export function RootPage() {
 
+    const dummyList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     const theme = useTheme()
 
+    const [chatListWidth, setChatListWidth] = useState(300); // Default width in pixels
+    const [isResizing, setIsResizing] = useState(false);
+    const [startMouseX, setStartMouseX] = useState(0); // Initial mouse X position
+    const [startWidth, setStartWidth] = useState(0); // Initial width of the chat list
+
+    const handleMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
+        e.preventDefault(); // Prevents text selection during resizing
+        setIsResizing(true);
+        setStartMouseX(e.clientX);
+        setStartWidth(chatListWidth);
+
+        // Add global event listeners
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+        if (!isResizing) return;
+
+        const delta = e.clientX - startMouseX;
+        const newWidth = Math.min(Math.max(startWidth + delta, 200), 400); // Keep width within min/max
+        setChatListWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+        if (isResizing) {
+            setIsResizing(false);
+
+            // Clean up event listeners
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
+        }
+    };
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (isResizing) {
+                const delta = e.clientX - startMouseX
+                const newWidth = Math.max(200, Math.min(startWidth + delta, 400))
+                setChatListWidth(newWidth)
+            }
+        };
+
+        if (isResizing) {
+            window.addEventListener("mousemove", handleMouseMove)
+            window.addEventListener("mouseup", handleMouseUp)
+        } else {
+            window.removeEventListener("mousemove", handleMouseMove)
+            window.removeEventListener("mouseup", handleMouseUp)
+        }
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove)
+            window.removeEventListener("mouseup", handleMouseUp)
+        };
+    }, [isResizing, startMouseX, startWidth])
+
+
     return (
-        <Box sx={{display: "flex"}}>
-            <CssBaseline/>
-            <Drawer variant="permanent" sx={{
-                [theme.breakpoints.up("sm")]: {
-                    width: `calc(${theme.spacing(16)} + 1px)`,
-                },
-                "& .MuiDrawer-paper": {
+        <Box
+            sx={{
+                display: "flex",
+                flexDirection: "row",
+                height: "100vh",
+                overflow: "hidden",
+            }}
+        >
+            <CssBaseline />
+            {/* Left Drawer */}
+            <Drawer
+                variant="permanent"
+                sx={{
                     [theme.breakpoints.up("sm")]: {
-                        width: `calc(${theme.spacing(16)} + 1px)`,
+                        width: `calc(${theme.spacing(12)} + 1px)`,
                     },
-                },
-            }}>
-                <Toolbar sx={{justifyContent: "center"}}>
+                    "& .MuiDrawer-paper": {
+                        [theme.breakpoints.up("sm")]: {
+                            width: `calc(${theme.spacing(12)} + 1px)`,
+                        },
+                    },
+                }}
+            >
+                <Toolbar sx={{ justifyContent: "center" }}>
                     <IconButton color="inherit">
-                        <Menu fontSize="large"/>
+                        <Menu fontSize="large" />
                     </IconButton>
                 </Toolbar>
-                <Divider/>
+                {/* Divider for Drawer */}
+                <Divider sx={{ height: "1px" }} />
                 <List>
-                    {["John", "Clark", "Smite"].map(value =>
-                        <ListItem disablePadding>
-                            <ListItemButton sx={{flexDirection: "column", justifyContent: "center", flexWrap: "wrap"}}>
-                                <Avatar sx={{justifyContent: "center"}}>{value[0]}</Avatar>
-                                <ListItemText sx={{textAlign: "center"}}>{value}</ListItemText>
+                    {dummyList.map((value) => (
+                        <ListItem disablePadding key={value}>
+                            <ListItemButton
+                                sx={{
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    flexWrap: "wrap",
+                                }}
+                            >
+                                <ListItemIcon sx={{ justifyContent: "center" }}>
+                                    <Folder fontSize="large" />
+                                </ListItemIcon>
+                                <ListItemText
+                                    sx={{ textAlign: "center" }}
+                                >
+                                    Folder {value}
+                                </ListItemText>
                             </ListItemButton>
                         </ListItem>
-                    )}
+                    ))}
                 </List>
             </Drawer>
-            <Box component="main" sx={{flexGrow: 1, p: 3}}>
-                <Typography sx={{marginBottom: 2}}>I'm trash :D</Typography>
-                <img alt="trash"
-                     src="http://www.quickmeme.com/img/c4/c4117905ec08b0df9aaf8c4a19433f31e1b62ea8f6d1680ccd2c3449ac9141bf.jpg"/>
+
+            {/* Chat List */}
+            <Box
+                sx={{
+                    width: chatListWidth,
+                    minWidth: "200px",
+                    maxWidth: "400px",
+                    bgcolor: theme.palette.background.paper,
+                    borderRight: `1px solid ${theme.palette.divider}`,
+                    overflowY: "auto",
+                    position: "relative",
+                }}
+            >
+                <Toolbar>
+                    <Autocomplete
+                        fullWidth
+                        freeSolo
+                        options={dummyList.map((option) => option)}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label="Search" size="small" />
+                        )}
+                    />
+                </Toolbar>
+                {/* Divider for Chat */}
+                <Divider
+                    sx={{
+                        height: "1px", // Explicitly define height
+                        backgroundColor: theme.palette.divider, // Match theme divider
+                        position: "relative",
+                    }}
+                />
+                <List>
+                    {dummyList.map((value, index) => (
+                        <ListItem key={index} disablePadding>
+                            <ListItemButton>
+                                <Avatar sx={{ marginRight: 2 }}>C</Avatar>
+                                <ListItemText
+                                    primaryTypographyProps={{
+                                        sx: {
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        },
+                                    }}
+                                    secondaryTypographyProps={{
+                                        sx: {
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        },
+                                    }}
+                                    primary={`Chat ${value}`}
+                                    secondary="Last message..."
+                                />
+                                <Typography
+                                    variant="body1"
+                                    alignSelf="baseline"
+                                >
+                                    10:00PM
+                                </Typography>
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+
+                {/* Resizable Divider */}
+                <Box
+                    onMouseDown={handleMouseDown}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        width: "5px",
+                        height: "100%",
+                        cursor: "ew-resize",
+                        zIndex: 1,
+                        bgcolor: "transparent",
+                    }}
+                />
+            </Box>
+
+            {/* Main Content */}
+            <Box
+                component="main"
+                sx={{
+                    flexGrow: 1,
+                    p: 3,
+                    overflowY: "auto",
+                }}
+            >
+                <Typography sx={{ marginBottom: 2 }}>I'm trash :D</Typography>
+                <img
+                    alt="trash"
+                    src="http://www.quickmeme.com/img/c4/c4117905ec08b0df9aaf8c4a19433f31e1b62ea8f6d1680ccd2c3449ac9141bf.jpg"
+                />
             </Box>
         </Box>
     )
