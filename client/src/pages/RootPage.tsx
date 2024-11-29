@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import {Folder, Menu} from "@mui/icons-material";
 import {MouseEventHandler, useEffect, useState} from "react";
+import {Outlet} from "react-router-dom";
 
 export function RootPage() {
 
@@ -200,6 +201,7 @@ export function RootPage() {
             </Box>
 
             <Box
+                bgcolor={theme.palette.primary.main}
                 component="main"
                 sx={{
                     flexGrow: 1,
@@ -207,11 +209,7 @@ export function RootPage() {
                     overflowY: "auto",
                 }}
             >
-                <Typography sx={{marginBottom: 2}}>I'm trash :D</Typography>
-                <img
-                    alt="trash"
-                    src="http://www.quickmeme.com/img/c4/c4117905ec08b0df9aaf8c4a19433f31e1b62ea8f6d1680ccd2c3449ac9141bf.jpg"
-                />
+                <Outlet/>
             </Box>
         </Box>
     )
