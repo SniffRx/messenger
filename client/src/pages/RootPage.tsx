@@ -18,12 +18,13 @@ import {
 } from "@mui/material";
 import {Folder, Menu} from "@mui/icons-material";
 import {MouseEventHandler, useEffect, useState} from "react";
-import {Outlet} from "react-router-dom";
+import {Outlet, useNavigate} from "react-router-dom";
 
 export function RootPage() {
 
     const dummyList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     const theme = useTheme()
+    const navigate = useNavigate()
 
     const [chatListWidth, setChatListWidth] = useState(300)
     const [isResizing, setIsResizing] = useState(false)
@@ -155,7 +156,7 @@ export function RootPage() {
                 <List>
                     {dummyList.map((value, index) =>
                         <ListItem key={index} disablePadding>
-                            <ListItemButton>
+                            <ListItemButton onClick={() => navigate(`chat/${value}`)}>
                                 <Avatar sx={{marginRight: 2}}>C</Avatar>
                                 <ListItemText
                                     primaryTypographyProps={{
