@@ -1,21 +1,12 @@
-import { FastifyInstance } from 'fastify';
-import { WebSocketServer, WebSocket } from 'ws';
-import { v4 as uuidv4 } from 'uuid';
-
-interface SignalMessage {
-    type: string;
-    groupId?: string;
-    recipientId?: string;
-    offer?: RTCSessionDescriptionInit;
-    answer?: RTCSessionDescriptionInit;
-    candidate?: RTCIceCandidate;
-    callerId?: string;
-}
+import {FastifyInstance} from 'fastify';
+import {WebSocketServer, WebSocket} from 'ws';
+import {v4 as uuidv4} from 'uuid';
+import {SignalMessage} from "./types";
 
 const clients: Map<string, WebSocket> = new Map();
 
 export default async function websocketRoutes(fastify: FastifyInstance) {
-    const wss = new WebSocketServer({ noServer: true });
+    const wss = new WebSocketServer({noServer: true});
 
     fastify.server.on('upgrade', (request, socket, head) => {
         if (request.url === '/ws') {
@@ -38,22 +29,20 @@ export default async function websocketRoutes(fastify: FastifyInstance) {
                     forwardSignal(message);
                     break;
                 case 'call-start':
-                    notifyGroup(message.groupId!, { type: 'call-start', callerId: clientId });
+                    notifyGroup(message.groupId!, {type: 'call-start', callerId: clientId});
                     break;
                 case 'screen-share-start':
-                    notifyGroup(message.groupId!, { type: 'screen-share-start', screenId: clientId });
+                    notifyGroup(message.groupId!, {type: 'screen-share-start', screenId: clientId});
                     break;
                 case 'screen-share-end':
-                    notifyGroup(message.groupId!, { type: 'screen-share-end', screenId: clientId });
+                    notifyGroup(message.groupId!, {type: 'screen-share-end', screenId: clientId});
                     break;
                 default:
                     console.error('Unknown message type:', message.type);
             }
         });
 
-        ws.on('close', () => {
-            clients.delete(clientId);
-        });
+        ws.on('close', () => clients.delete(clientId));
     });
 
     function forwardSignal(message: SignalMessage) {

@@ -1,16 +1,10 @@
 import { pgpool } from "../../database/postgresql";
 import {FastifyInstance} from "fastify";
+import {AddFriendRequest} from "./types";
 
 export async function addFriends(server: FastifyInstance) {
 // Добавление друга
-    server.post<{
-        Headers: {
-            Authorization: string;
-        };
-        Body: {
-            friendUsername: string;
-        };
-    }>('/friends/add', {onRequest: [server.authenticate]}, async (request, reply) => {
+    server.post<AddFriendRequest>('/friends/add', {onRequest: [server.authenticate]}, async (request, reply) => {
 
         // Проверяем, что тело запроса существует
         if (!request.body) {

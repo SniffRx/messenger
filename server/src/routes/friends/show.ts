@@ -1,12 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { pgpool } from "../../database/postgresql";
+import {ShowFriendRequest} from "./types";
 
 export async function showFriends(server: FastifyInstance) {
-    server.get<{
-        Headers: {
-            Authorization: string;
-        };
-    }>('/friends', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.get<ShowFriendRequest>('/friends', { onRequest: [server.authenticate] }, async (request, reply) => {
         try {
             const { userId } = request.user as { userId: number; username: string };
             // const userId = (request as any).userId; // Достаем userId из токена

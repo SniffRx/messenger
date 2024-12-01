@@ -1,17 +1,11 @@
 import { pgpool } from "../../database/postgresql";
 import {FastifyInstance} from "fastify";
+import {RemoveFriendRequest} from "./types";
 
 export async function removeFriends(server: FastifyInstance)
 {
     // Удаление друга
-    server.delete<{
-        Headers: {
-            Authorization: string;
-        };
-        Body: {
-            friendUsername: string;
-        };
-    }>('/friends/remove', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.delete<RemoveFriendRequest>('/friends/remove', { onRequest: [server.authenticate] }, async (request, reply) => {
         // Проверяем, что тело запроса существует
         if (!request.body) {
             return reply.status(400).send({ error: 'Request body is required' });

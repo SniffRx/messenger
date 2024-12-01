@@ -1,30 +1,10 @@
 import { FastifyInstance } from 'fastify';
 import { getMongoDb } from '../../database/mongodb';
 import {Collection, ObjectId} from "mongodb";
-
-// Определяем интерфейс для документа чата
-interface ChatDocument {
-    _id: ObjectId;
-    participants: number[]; // Список участников чата
-    messages: {
-        senderId: number;
-        content: string;
-        messageType: string;
-        createdAt: Date;
-    }[]; // Сообщения в чате
-}
-
+import {ChatDocument, SendMessageRequest} from "./types";
 
 export async function sendMessage(server: FastifyInstance) {
-    server.post<{
-        Headers: {
-            Authorization: string;
-        };
-        Body: {
-            chatId: string;
-            message: string;
-        };
-    }>('/chats/send-message', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.post<SendMessageRequest>('/chats/send-message', { onRequest: [server.authenticate] }, async (request, reply) => {
         const { chatId, message } = request.body;
 
         if (!chatId || !message) {

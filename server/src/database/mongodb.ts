@@ -1,10 +1,11 @@
 import { MongoClient } from 'mongodb';
 import "colors.ts"
 
-const mongoUrl = 'mongodb://localhost:27017'; // URL для подключения к MongoDB
+const mongoUrl = 'mongodb://0.0.0.0:27017'; // URL для подключения к MongoDB
 const dbName = 'chatapp'; // Название базы данных
 
 export const mongoClient = new MongoClient(mongoUrl);
+
 export const connectToMongoDB = async () => {
     try {
         await mongoClient.connect();

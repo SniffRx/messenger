@@ -1,12 +1,9 @@
 import { FastifyInstance } from 'fastify';
 import { getMongoDb } from '../../database/mongodb';
+import {GetChatsRequest} from "./types";
 
 export async function getChats(server: FastifyInstance) {
-    server.get<{
-        Headers: {
-            Authorization: string;
-        };
-    }>('/chats', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.get<GetChatsRequest>('/chats', { onRequest: [server.authenticate] }, async (request, reply) => {
         try {
             const { userId } = request.user as { userId: number; username: string };
 

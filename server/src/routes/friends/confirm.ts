@@ -1,15 +1,9 @@
 import { pgpool } from "../../database/postgresql";
 import { FastifyInstance } from "fastify";
+import {ConfirmFriendRequest} from "./types";
 
 export async function confirmFriend(server: FastifyInstance) {
-    server.post<{
-        Headers: {
-            Authorization: string;
-        };
-        Body: {
-            friendId: number;
-        };
-    }>('/friends/confirm', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.post<ConfirmFriendRequest>('/friends/confirm', { onRequest: [server.authenticate] }, async (request, reply) => {
 
         if (!request.body) {
             return reply.status(400).send({ error: 'Friend ID is required' });

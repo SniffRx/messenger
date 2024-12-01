@@ -1,14 +1,10 @@
 import {pgpool} from "../database/postgresql";
 import bcrypt from "bcrypt";
 import {FastifyInstance} from "fastify";
+import {RegisterRequest} from "./types";
 
 export async function register(server: FastifyInstance){
-    server.post<{
-        Body: {
-            username: string,
-            password: string,
-        }
-    }>('/register', async (request, reply) => {
+    server.post<RegisterRequest>('/register', async (request, reply) => {
         console.log('Received Request Body:', request.body);
 
         // Проверим, что тело запроса не пустое

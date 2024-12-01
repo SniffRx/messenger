@@ -1,10 +1,11 @@
 import {pgpool} from "../database/postgresql";
 import bcrypt from "bcrypt";
 import {FastifyInstance} from "fastify";
+import {LoginRequest} from "./types";
 
 export async function login(server: FastifyInstance){
-    server.post('/login', async (request, reply) => {
-        const { username, password } = request.body as { username: string, password: string };
+    server.post<LoginRequest>('/login', async (request, reply) => {
+        const { username, password } = request.body;
         try {
             // Поиск пользователя
             const result = await pgpool.query('SELECT * FROM users WHERE username = $1', [username]);

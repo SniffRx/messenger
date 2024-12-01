@@ -1,9 +1,10 @@
-import Fastify, {FastifyReply, FastifyRequest} from "fastify"
+import Fastify from "fastify"
 import dotenv from 'dotenv'
 import jwt from "@fastify/jwt";
 import fastifyFormbody from '@fastify/formbody'
 import {registerRoutes} from "./routes";
 import "colors.ts";
+import {registerMiddleWare} from "./middleware/middleware";
 
 dotenv.config()
 
@@ -20,33 +21,14 @@ server.register(jwt, {
 
 server.register(fastifyFormbody);
 
-
-// Расширяем сервер через `declare`
-declare module 'fastify' {
-    interface FastifyInstance {
-        authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    }
-}
-
-// Добавляем декоратор `authenticate`
-server.decorate('authenticate', async (request: FastifyRequest, reply: FastifyReply) => {
-    try {
-        const token = request.headers.authorization?.replace('Bearer ', '');
-        if (!token) {
-            reply.status(401).send({ error: 'Token is required'.red });
-            return;
-        }
-        request.user = server.jwt.verify(token) as { userId: number; username: string }; // Сохраняем декодированный токен
-    } catch (err) {
-        reply.status(401).send({ error: 'Invalid or expired token'.red });
-    }
-});
-
 // Регистрируем маршруты
 registerRoutes(server);
+registerMiddleWare(server)
 
-
-server.listen({host: process.env.ADDRESS ?? "0.0.0.0", port: 3000}, (err, address) => {
+server.listen({
+    host: process.env.ADDRESS ?? "0.0.0.0",
+    port: 3000
+}, (err, address) => {
     if (err) {
         console.error(`${err}`.red);
         process.exit(1);
