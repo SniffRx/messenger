@@ -3,7 +3,8 @@ import {WebSocketServer, WebSocket} from 'ws';
 import {v4 as uuidv4} from 'uuid';
 import {SignalMessage} from "./types";
 
-const clients: Map<string, WebSocket> = new Map();
+const clients: Map<string, WebSocket> = new Map(); // Маппинг пользователей по их ID
+const groups: Map<string, Set<string>> = new Map(); // Группы пользователей для видеозвонков
 
 export default async function websocketRoutes(fastify: FastifyInstance) {
     const wss = new WebSocketServer({noServer: true});
@@ -19,6 +20,7 @@ export default async function websocketRoutes(fastify: FastifyInstance) {
     wss.on('connection', (ws) => {
         const clientId = uuidv4();
         clients.set(clientId, ws);
+        console.log(`User connected: ${clientId}`);
 
         ws.on('message', (data) => {
             const message: SignalMessage = JSON.parse(data.toString());
@@ -29,6 +31,7 @@ export default async function websocketRoutes(fastify: FastifyInstance) {
                     forwardSignal(message);
                     break;
                 case 'call-start':
+                    joinGroup(message.groupId!, clientId);
                     notifyGroup(message.groupId!, {type: 'call-start', callerId: clientId});
                     break;
                 case 'screen-share-start':
@@ -42,7 +45,12 @@ export default async function websocketRoutes(fastify: FastifyInstance) {
             }
         });
 
-        ws.on('close', () => clients.delete(clientId));
+        // ws.on('close', () => clients.delete(clientId));
+        ws.on('close', () => {
+            clients.delete(clientId);
+            leaveGroup(clientId);
+            console.log(`User disconnected: ${clientId}`);
+        });
     });
 
     function forwardSignal(message: SignalMessage) {
@@ -52,10 +60,36 @@ export default async function websocketRoutes(fastify: FastifyInstance) {
         }
     }
 
+    // Функция для уведомления всей группы
     function notifyGroup(groupId: string, payload: Record<string, any>) {
-        // Здесь можно использовать вашу логику для отправки сообщений в группу
-        clients.forEach((client) => {
-            client.send(JSON.stringify(payload));
+        const group = groups.get(groupId);
+        if (group) {
+            group.forEach((clientId) => {
+                const clientWs = clients.get(clientId);
+                if (clientWs) {
+                    clientWs.send(JSON.stringify(payload));
+                }
+            });
+        }
+    }
+
+    // Функция для добавления пользователя в группу
+    function joinGroup(groupId: string, clientId: string) {
+        if (!groups.has(groupId)) {
+            groups.set(groupId, new Set());
+        }
+        groups.get(groupId)?.add(clientId);
+    }
+
+    // Функция для удаления пользователя из группы
+    function leaveGroup(clientId: string) {
+        groups.forEach((group, groupId) => {
+            if (group.has(clientId)) {
+                group.delete(clientId);
+                if (group.size === 0) {
+                    groups.delete(groupId); // Удаляем пустую группу
+                }
+            }
         });
     }
 }
