@@ -14,64 +14,60 @@ import {
     TextField,
     Toolbar,
     Typography,
-    useTheme
+    useTheme,
 } from "@mui/material";
-import {Folder, Menu} from "@mui/icons-material";
-import {MouseEventHandler, useEffect, useState} from "react";
-import {Outlet, useNavigate} from "react-router-dom";
+import { Folder, Menu } from "@mui/icons-material";
+import { MouseEventHandler, useEffect, useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export function RootPage() {
+    const [dummyList, setDummyList] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]); // Место для ваших чатов и папок
+    const theme = useTheme();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const dummyList = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-    const theme = useTheme()
-    const navigate = useNavigate()
+    const [chatListWidth, setChatListWidth] = useState(300);
+    const [isResizing, setIsResizing] = useState(false);
+    const [startMouseX, setStartMouseX] = useState(0);
+    const [startWidth, setStartWidth] = useState(0);
 
-    const [chatListWidth, setChatListWidth] = useState(300)
-    const [isResizing, setIsResizing] = useState(false)
-    const [startMouseX, setStartMouseX] = useState(0)
-    const [startWidth, setStartWidth] = useState(0)
+    useEffect(() => {
+        // Проверка авторизации. Если не авторизован, редирект на страницу входа
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+            navigate("/login");
+        } else {
+            // Здесь можно добавить дополнительные проверки или запросы к серверу, чтобы убедиться в действительности токена.
+        }
+    }, [navigate]);
 
     const handleMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
-        e.preventDefault()
-        setIsResizing(true)
-        setStartMouseX(e.clientX)
-        setStartWidth(chatListWidth)
+        e.preventDefault();
+        setIsResizing(true);
+        setStartMouseX(e.clientX);
+        setStartWidth(chatListWidth);
 
-        window.addEventListener("mousemove", handleMouseMove)
-        window.addEventListener("mouseup", handleMouseUp)
-    }
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
+    };
 
     const handleMouseMove = (e: MouseEvent) => {
-        if (!isResizing) return
+        if (!isResizing) return;
 
-        const delta = e.clientX - startMouseX
-        const newWidth = Math.min(Math.max(startWidth + delta, 200), 400)
-        setChatListWidth(newWidth)
-    }
+        const delta = e.clientX - startMouseX;
+        const newWidth = Math.min(Math.max(startWidth + delta, 200), 400);
+        setChatListWidth(newWidth);
+    };
 
     const handleMouseUp = () => {
         if (isResizing) {
-            setIsResizing(false)
+            setIsResizing(false);
 
-            window.removeEventListener("mousemove", handleMouseMove)
-            window.removeEventListener("mouseup", handleMouseUp)
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
         }
-    }
-
-    useEffect(() => {
-        if (isResizing) {
-            window.addEventListener("mousemove", handleMouseMove)
-            window.addEventListener("mouseup", handleMouseUp)
-        } else {
-            window.removeEventListener("mousemove", handleMouseMove)
-            window.removeEventListener("mouseup", handleMouseUp)
-        }
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove)
-            window.removeEventListener("mouseup", handleMouseUp)
-        }
-    }, [isResizing, startMouseX, startWidth])
-
+    };
 
     return (
         <Box
@@ -82,7 +78,7 @@ export function RootPage() {
                 overflow: "hidden",
             }}
         >
-            <CssBaseline/>
+            <CssBaseline />
             <Drawer
                 variant="permanent"
                 sx={{
@@ -96,12 +92,12 @@ export function RootPage() {
                     },
                 }}
             >
-                <Toolbar sx={{justifyContent: "center"}}>
+                <Toolbar sx={{ justifyContent: "center" }}>
                     <IconButton color="inherit">
-                        <Menu fontSize="large"/>
+                        <Menu fontSize="large" />
                     </IconButton>
                 </Toolbar>
-                <Divider sx={{height: "1px"}}/>
+                <Divider sx={{ height: "1px" }} />
                 <List>
                     {dummyList.map((value) => (
                         <ListItem disablePadding key={value}>
@@ -112,12 +108,10 @@ export function RootPage() {
                                     flexWrap: "wrap",
                                 }}
                             >
-                                <ListItemIcon sx={{justifyContent: "center"}}>
-                                    <Folder fontSize="large"/>
+                                <ListItemIcon sx={{ justifyContent: "center" }}>
+                                    <Folder fontSize="large" />
                                 </ListItemIcon>
-                                <ListItemText
-                                    sx={{textAlign: "center"}}
-                                >
+                                <ListItemText sx={{ textAlign: "center" }}>
                                     Folder {value}
                                 </ListItemText>
                             </ListItemButton>
@@ -142,22 +136,17 @@ export function RootPage() {
                         fullWidth
                         freeSolo
                         options={dummyList.map((option) => option)}
-                        renderInput={(params) =>
-                            <TextField {...params} variant="outlined" label="Search" size="small"/>}
+                        renderInput={(params) => (
+                            <TextField {...params} variant="outlined" label="Search" size="small" />
+                        )}
                     />
                 </Toolbar>
-                <Divider
-                    sx={{
-                        height: "1px",
-                        backgroundColor: theme.palette.divider,
-                        position: "relative",
-                    }}
-                />
+                <Divider sx={{ height: "1px", backgroundColor: theme.palette.divider, position: "relative" }} />
                 <List>
-                    {dummyList.map((value, index) =>
+                    {dummyList.map((value, index) => (
                         <ListItem key={index} disablePadding>
                             <ListItemButton onClick={() => navigate(`chat/${value}`)}>
-                                <Avatar sx={{marginRight: 2}}>C</Avatar>
+                                <Avatar sx={{ marginRight: 2 }}>C</Avatar>
                                 <ListItemText
                                     primaryTypographyProps={{
                                         sx: {
@@ -176,14 +165,12 @@ export function RootPage() {
                                     primary={`Chat ${value}`}
                                     secondary="Last message..."
                                 />
-                                <Typography
-                                    variant="body1"
-                                    alignSelf="baseline"
-                                >
+                                <Typography variant="body1" alignSelf="baseline">
                                     10:00PM
                                 </Typography>
                             </ListItemButton>
-                        </ListItem>)}
+                        </ListItem>
+                    ))}
                 </List>
 
                 <Box
@@ -210,8 +197,8 @@ export function RootPage() {
                     overflowY: "auto",
                 }}
             >
-                <Outlet/>
+                <Outlet />
             </Box>
         </Box>
-    )
+    );
 }
