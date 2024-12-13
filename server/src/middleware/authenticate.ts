@@ -10,7 +10,7 @@ export async function authenticate(server: FastifyInstance) {
                 return;
             }
 
-            request.user = server.jwt.verify(token) as { userId: number; username: string }; // Сохраняем декодированный токен
+            request.user = server.jwt.verify(token) as { userId: number; username: string; email: string; }; // Сохраняем декодированный токен
         } catch (err) {
             reply.status(401).send({error: 'Invalid or expired token'.red});
         }

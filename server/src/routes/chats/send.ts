@@ -12,7 +12,7 @@ export async function sendMessage(server: FastifyInstance) {
         }
 
         try {
-            const { userId } = request.user as { userId: number; username: string };
+            const { userId } = request.user as { userId: number; username: string; email: string; };
 
             // Находим чат
             // Получаем коллекцию чатов с типизацией

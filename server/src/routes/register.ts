@@ -13,15 +13,15 @@ export async function register(server: FastifyInstance){
             return reply.status(400).send({ error: 'Request body is empty' });
         }
 
-        const { username, password } = request.body;
+        const { email, username, password } = request.body;
 
-        if (!username || !password) {
-            console.error('Username or password is missing');
-            return reply.status(400).send({ error: 'Username and password are required' });
+        if (!email || !username || !password) {
+            console.error('Email, Username or password is missing');
+            return reply.status(400).send({ error: 'Email, Username and password are required' });
         }
 
         // Проверка на существование пользователя
-        const userCheck = await pgpool.query('SELECT * FROM users WHERE username = $1', [username]);
+        const userCheck = await pgpool.query('SELECT * FROM users WHERE email = $1', [email]);
         if (userCheck.rows.length > 0) {
             return reply.status(400).send({ error: 'User already exists' });
         }
@@ -30,7 +30,7 @@ export async function register(server: FastifyInstance){
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Вставка пользователя в БД
-        await pgpool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, hashedPassword]);
+        await pgpool.query('INSERT INTO users (email, username, password) VALUES ($1, $2, $3)', [email, username, hashedPassword]);
 
         reply.status(201).send({ message: 'User registered successfully' });
     });

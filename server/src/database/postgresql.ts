@@ -1,11 +1,12 @@
 import {Pool} from 'pg';
+import dotenv from "dotenv";
 
 export const pgpool = new Pool({
-    user: 'postgres',
-    host: '0.0.0.0',
-    database: 'messenger',
-    password: '192837456serg',
-    port: 5432, // Порт по умолчанию
+    user: process.env.POSTGRESQL_USER,
+    host: process.env.POSTGRESQL_HOST,
+    database: process.env.POSTGRESQL_DATABASE,
+    password: process.env.POSTGRESQL_PASSWORD,
+    port: Number(process.env.POSTGRESQL_PORT), // Порт по умолчанию
     max: 13,
 });
 

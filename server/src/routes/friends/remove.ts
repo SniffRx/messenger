@@ -18,7 +18,7 @@ export async function removeFriends(server: FastifyInstance)
         }
 
         try {
-            const { userId } = request.user as { userId: number; username: string };
+            const { userId } = request.user as { userId: number; username: string; email: string; };
             // const userId = (request as any).userId; // Достаем userId из токена
 
             // Проверяем, существует ли пользователь с таким именем

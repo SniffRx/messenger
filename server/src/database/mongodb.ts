@@ -1,8 +1,8 @@
 import { MongoClient } from 'mongodb';
 import "colors.ts"
 
-const mongoUrl = 'mongodb://0.0.0.0:27017'; // URL для подключения к MongoDB
-const dbName = 'chatapp'; // Название базы данных
+const mongoUrl = String(process.env.MONGODB_HOST); // URL для подключения к MongoDB
+const dbName = process.env.MONGODB_DATABASE; // Название базы данных
 
 export const mongoClient = new MongoClient(mongoUrl);
 

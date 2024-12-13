@@ -5,7 +5,7 @@ import {ShowFriendRequest} from "./types";
 export async function showFriends(server: FastifyInstance) {
     server.get<ShowFriendRequest>('/friends', { onRequest: [server.authenticate] }, async (request, reply) => {
         try {
-            const { userId } = request.user as { userId: number; username: string };
+            const { userId } = request.user as { userId: number; username: string; email: string; };
             // const userId = (request as any).userId; // Достаем userId из токена
 
             const friends = await pgpool.query(

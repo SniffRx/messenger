@@ -17,7 +17,7 @@ export async function confirmFriend(server: FastifyInstance) {
 
         try {
             // Получаем текущего пользователя из токена
-            const { userId } = request.user as { userId: number; username: string };
+            const { userId } = request.user as { userId: number; username: string; email: string; };
 
             // Проверяем, существует ли заявка на дружбу
             const pendingRequest = await pgpool.query(

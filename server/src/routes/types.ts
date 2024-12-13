@@ -1,12 +1,13 @@
 export interface LoginRequest {
     Body: {
-        username: string,
+        email: string,
         password: string
     }
 }
 
 export interface RegisterRequest {
     Body: {
+        email: string,
         username: string,
         password: string,
     }

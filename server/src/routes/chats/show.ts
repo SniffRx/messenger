@@ -5,7 +5,7 @@ import {GetChatsRequest} from "./types";
 export async function getChats(server: FastifyInstance) {
     server.get<GetChatsRequest>('/chats', { onRequest: [server.authenticate] }, async (request, reply) => {
         try {
-            const { userId } = request.user as { userId: number; username: string };
+            const { userId } = request.user as { userId: number; username: string; email: string; };
 
             const chatCollection = getMongoDb().collection('chats');
             const chats = await chatCollection.find({ participants: userId }).toArray();

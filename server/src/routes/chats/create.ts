@@ -12,7 +12,7 @@ export async function createChat(server: FastifyInstance) {
         }
 
         try {
-            const {userId} = request.user as { userId: number; username: string };
+            const {userId} = request.user as { userId: number; username: string; email: string; };
 
             // Найти пользователя получателя
             const receiver = await pgpool.query('SELECT id FROM users WHERE username = $1', [receiverUsername]);

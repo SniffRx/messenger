@@ -12,7 +12,7 @@ export async function createGroupChat(server: FastifyInstance) {
         }
 
         try {
-            const {userId} = request.user as { userId: number; username: string };
+            const {userId} = request.user as { userId: number; username: string; email: string; };
 
             // Находим участников чата
             const users = await pgpool.query('SELECT id, username FROM users WHERE username = ANY($1)', [
