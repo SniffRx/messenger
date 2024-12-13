@@ -193,11 +193,9 @@ export function RootPage() {
             <Box
                 bgcolor={theme.palette.primary.main}
                 component="main"
-                sx={{
-                    flexGrow: 1,
-                    p: 0,
-                    overflowY: "auto",
-                }}
+                padding={0}
+                flexGrow={1}
+                overflowY="auto"
             >
                 <Outlet />
             </Box>

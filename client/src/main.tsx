@@ -3,7 +3,7 @@ import {createRoot} from "react-dom/client"
 import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} from "react-router-dom";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {RootPage} from "./pages/RootPage.tsx";
-import {ChatPage} from "./pages/ChatPage.tsx";
+import {ChatPage} from "./pages/chat/ChatPage.tsx";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute.tsx";
 import {ErrorPage} from "./pages/ErrorPage.tsx";
