@@ -195,7 +195,7 @@ export function RootPage() {
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    p: 3,
+                    p: 0,
                     overflowY: "auto",
                 }}
             >
