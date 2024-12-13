@@ -18,8 +18,7 @@ import {
 } from "@mui/material";
 import { Folder, Menu } from "@mui/icons-material";
 import { MouseEventHandler, useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 export function RootPage() {
     const [dummyList, setDummyList] = useState([1, 2, 3, 4, 5, 6, 7, 8, 9]); // Место для ваших чатов и папок
@@ -35,12 +34,10 @@ export function RootPage() {
     useEffect(() => {
         // Проверка авторизации. Если не авторизован, редирект на страницу входа
         const token = localStorage.getItem("authToken");
-        if (!token) {
+        if (!token && location.pathname !== "/login" && location.pathname !== "/register") {
             navigate("/login");
-        } else {
-            // Здесь можно добавить дополнительные проверки или запросы к серверу, чтобы убедиться в действительности токена.
         }
-    }, [navigate]);
+    }, [navigate, location]);
 
     const handleMouseDown: MouseEventHandler<HTMLDivElement> = (e) => {
         e.preventDefault();
@@ -68,6 +65,11 @@ export function RootPage() {
             window.removeEventListener("mouseup", handleMouseUp);
         }
     };
+
+    // Скрываем `RootPage` для страниц /login и /register
+    if (location.pathname === "/login" || location.pathname === "/register") {
+        return <Outlet />;
+    }
 
     return (
         <Box

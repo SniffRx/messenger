@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('authToken');
+        if (token) {
+            navigate('/'); // Если токен есть, редирект на главную страницу
+        }
+    }, [navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -16,9 +25,10 @@ export function LoginPage() {
         }
 
         try {
-            // Simulate login request
             const response = await fakeLogin(email, password);
+            localStorage.setItem('authToken', 'fake-token'); // Сохраняем токен
             console.log('Login successful:', response);
+            navigate('/'); // Редирект после успешного входа
         } catch (err: any) {
             setError(err.message || 'Something went wrong.');
         }
@@ -76,6 +86,14 @@ export function LoginPage() {
                 {error && <Alert severity="error">{error}</Alert>}
                 <Button type="submit" variant="contained" color="primary" fullWidth>
                     Login
+                </Button>
+                <Button
+                    variant="text"
+                    color="secondary"
+                    fullWidth
+                    onClick={() => navigate('/register')}
+                >
+                    Register
                 </Button>
             </Box>
         </Box>
