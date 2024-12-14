@@ -6,10 +6,20 @@ import {
     Stack,
     TextField,
     Typography,
+    Dialog,
+    DialogContent,
+    DialogActions,
+    Button,
 } from "@mui/material";
-import { Send, AttachFile, MoreVert } from "@mui/icons-material";
-import {Message} from "./components/Message.tsx";
-import {ContentType} from "./components/types.ts";
+import {
+    Send,
+    AttachFile,
+    MoreVert,
+    VideoCall,
+    ScreenShare,
+} from "@mui/icons-material";
+import { Message } from "./components/Message.tsx";
+import { ContentType } from "./components/types.ts";
 
 export function ChatPage() {
     const [messages, setMessages] = useState(
@@ -21,6 +31,14 @@ export function ChatPage() {
             type: (Math.random() < 0.8 ? "text" : "image") as ContentType,
         }))
     );
+
+    const [isVideoCallOpen, setVideoCallOpen] = useState(false);
+    const [isScreenShareOpen, setScreenShareOpen] = useState(false);
+
+    const handleVideoCall = () => setVideoCallOpen(true);
+    const handleScreenShare = () => setScreenShareOpen(true);
+    const handleCloseVideoCall = () => setVideoCallOpen(false);
+    const handleCloseScreenShare = () => setScreenShareOpen(false);
 
     return (
         <Box
@@ -58,9 +76,17 @@ export function ChatPage() {
                         </Typography>
                     </Box>
                 </Stack>
-                <IconButton>
-                    <MoreVert />
-                </IconButton>
+                <Stack direction="row" spacing={1}>
+                    <IconButton onClick={handleVideoCall}>
+                        <VideoCall />
+                    </IconButton>
+                    <IconButton onClick={handleScreenShare}>
+                        <ScreenShare />
+                    </IconButton>
+                    <IconButton>
+                        <MoreVert />
+                    </IconButton>
+                </Stack>
             </Box>
 
             {/* Messages */}
@@ -114,6 +140,70 @@ export function ChatPage() {
                     <Send />
                 </IconButton>
             </Box>
+
+            {/* Video Call Dialog */}
+            <Dialog
+                open={isVideoCallOpen}
+                onClose={handleCloseVideoCall}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogContent>
+                    <Typography variant="h6" gutterBottom>
+                        Video Call in Progress
+                    </Typography>
+                    <Box
+                        sx={{
+                            width: "100%",
+                            height: "400px",
+                            bgcolor: "#000",
+                            borderRadius: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Typography color="white">Video Stream</Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseVideoCall} color="secondary">
+                        End Call
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Screen Share Dialog */}
+            <Dialog
+                open={isScreenShareOpen}
+                onClose={handleCloseScreenShare}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogContent>
+                    <Typography variant="h6" gutterBottom>
+                        Screen Sharing in Progress
+                    </Typography>
+                    <Box
+                        sx={{
+                            width: "100%",
+                            height: "400px",
+                            bgcolor: "#000",
+                            borderRadius: 2,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Typography color="white">Screen Share Stream</Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseScreenShare} color="secondary">
+                        Stop Sharing
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

@@ -5,10 +5,10 @@ import {LoginRequest} from "./types";
 
 export async function login(server: FastifyInstance){
     server.post<LoginRequest>('/login', async (request, reply) => {
-        const { username, password } = request.body;
+        const { email, password } = request.body;
         try {
             // Поиск пользователя
-            const result = await pgpool.query('SELECT * FROM users WHERE username = $1', [username]);
+            const result = await pgpool.query('SELECT * FROM users WHERE email = $1', [email]);
             if (result.rows.length === 0) {
                 return reply.status(401).send({ error: 'Invalid username or password' });
             }

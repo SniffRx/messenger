@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { fetchAPI } from '../api/apiClient'; // Импортируем функцию для запросов
 
 export function RegisterPage() {
     const [email, setEmail] = useState('');
@@ -33,25 +34,33 @@ export function RegisterPage() {
         }
 
         try {
-            const response = await fakeRegister(email, password);
-            setSuccess(response);
-            setTimeout(() => navigate('/login'), 2000); // Редирект через 2 секунды
+            // Отправляем запрос на сервер для регистрации
+            const response = await fetchAPI('/api/register', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+            });
+
+            setSuccess('Registration successful!');
+            setTimeout(() => navigate('/login'), 2000); // Редирект на страницу логина через 2 секунды
+            // const response = await fakeRegister(email, password);
+            // setSuccess(response);
+            // setTimeout(() => navigate('/login'), 2000); // Редирект через 2 секунды
         } catch (err: any) {
             setError(err.message || 'Something went wrong.');
         }
     };
 
-    const fakeRegister = (email: string, password: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (email !== 'existing@example.com') {
-                    resolve('Registration successful!');
-                } else {
-                    reject(new Error('Email already in use.'));
-                }
-            }, 1000);
-        });
-    };
+    // const fakeRegister = (email: string, password: string): Promise<string> => {
+    //     return new Promise((resolve, reject) => {
+    //         setTimeout(() => {
+    //             if (email !== 'existing@example.com') {
+    //                 resolve('Registration successful!');
+    //             } else {
+    //                 reject(new Error('Email already in use.'));
+    //             }
+    //         }, 1000);
+    //     });
+    // };
 
     return (
         <Box

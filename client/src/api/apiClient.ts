@@ -1,7 +1,7 @@
-const API_BASE_URL = 'http://127.0.0.1:3000/';
+const API_BASE_URL = 'http://127.0.0.1:3000';
 
 // Helper function to send requests
-async function fetchAPI(endpoint: string, options: RequestInit = {}): Promise<any> {
+export async function fetchAPI(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = `${API_BASE_URL}${endpoint}`;
 
     const defaultHeaders: HeadersInit = {

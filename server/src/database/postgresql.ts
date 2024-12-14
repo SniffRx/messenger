@@ -1,5 +1,6 @@
 import {Pool} from 'pg';
 import dotenv from "dotenv";
+dotenv.config(); // Загружает .env
 
 export const pgpool = new Pool({
     user: process.env.POSTGRESQL_USER,

@@ -5,6 +5,7 @@ import fastifyFormbody from '@fastify/formbody'
 import {registerRoutes} from "./routes";
 import "colors.ts";
 import {registerMiddleWare} from "./middleware/middleware";
+import cors from '@fastify/cors';
 
 dotenv.config()
 
@@ -14,6 +15,12 @@ export const server = Fastify({
         level: "warn"
     }
 })
+
+server.register(cors, {
+    origin: 'http://localhost:5173', // Укажите адрес вашего клиента
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Разрешённые методы
+    allowedHeaders: ['Content-Type', 'Authorization'], // Разрешённые заголовки
+});
 
 server.register(jwt, {
     secret: process.env.JWT_SECRET ?? 'your-secret-key'

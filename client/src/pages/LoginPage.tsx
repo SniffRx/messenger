@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Button, TextField, Typography, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { fetchAPI } from '../api/apiClient'; // Импортируем функцию для запросов
 
 export function LoginPage() {
     const [email, setEmail] = useState('');
@@ -25,26 +26,35 @@ export function LoginPage() {
         }
 
         try {
-            const response = await fakeLogin(email, password);
-            localStorage.setItem('authToken', 'fake-token'); // Сохраняем токен
+            // Отправка запроса на сервер для авторизации
+            const response = await fetchAPI('/login', {
+                method: 'POST',
+                body: JSON.stringify({ email, password }),
+            });
+            // Если вход успешен, сохраняем токен в localStorage
+            localStorage.setItem('authToken', response.token);
             console.log('Login successful:', response);
             navigate('/'); // Редирект после успешного входа
+            // const response = await fakeLogin(email, password);
+            // localStorage.setItem('authToken', 'fake-token'); // Сохраняем токен
+            // console.log('Login successful:', response);
+            // navigate('/'); // Редирект после успешного входа
         } catch (err: any) {
             setError(err.message || 'Something went wrong.');
         }
     };
 
-    const fakeLogin = (email: string, password: string): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (email === 'user@example.com' && password === 'password123') {
-                    resolve('Login successful!');
-                } else {
-                    reject(new Error('Invalid email or password.'));
-                }
-            }, 1000);
-        });
-    };
+    // const fakeLogin = (email: string, password: string): Promise<string> => {
+    //     return new Promise((resolve, reject) => {
+    //         setTimeout(() => {
+    //             if (email === 'user@example.com' && password === 'password123') {
+    //                 resolve('Login successful!');
+    //             } else {
+    //                 reject(new Error('Invalid email or password.'));
+    //             }
+    //         }, 1000);
+    //     });
+    // };
 
     return (
         <Box
