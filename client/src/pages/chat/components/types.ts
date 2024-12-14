@@ -6,4 +6,4 @@ export interface ChatMessage {
     type: ContentType
 }
 
-export type ContentType = "text" | "image"
+export type ContentType = "text" | "image" | "video" | "audio"

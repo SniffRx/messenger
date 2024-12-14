@@ -24,28 +24,57 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}): Pro
     return response.json();
 }
 
-// Example API calls
-export async function getUserFriends(): Promise<any> {
-    return fetchAPI('/friends', {
-        method: 'GET',
-    });
-}
-
-export async function addUserFriend(friendId: string): Promise<any> {
-    return fetchAPI('/friends', {
+export async function createChat(receiverUsername: string): Promise<any> {
+    return fetchAPI('/chats/create', {
         method: 'POST',
-        body: JSON.stringify({ friendId }),
+        body: JSON.stringify({ receiverUsername }),
     });
 }
 
-export async function acceptUserFriendRequest(requestId: string): Promise<any> {
-    return fetchAPI(`/friends/requests/${requestId}`, {
-        method: 'PUT', // Assuming a PUT request for accepting requests
+export async function createGroupChat(chatName: string, participants: string[]): Promise<any> {
+    return fetchAPI('/chats/create-group', {
+        method: 'POST',
+        body: JSON.stringify({ chatName, participants }),
     });
 }
 
-export async function removeUserFriend(friendId: string): Promise<any> {
-    return fetchAPI(`/friends/${friendId}`, {
+export async function sendMessage(chatId: string, message: string): Promise<any> {
+    return fetchAPI('/chats/send-message', {
+        method: 'POST',
+        body: JSON.stringify({ chatId, message }),
+    });
+}
+
+// Вставьте эту функцию в apiClient.ts
+export async function fetchChatMessages(chatId: string): Promise<any> {
+    return fetchAPI(`/chats/${chatId}/messages`, { method: 'GET' });
+}
+
+export async function getChats(): Promise<any> {
+    return fetchAPI('/chats', { method: 'GET' });
+}
+
+export async function getUserFriends(): Promise<any> {
+    return fetchAPI('/friends', { method: 'GET' });
+}
+
+export async function addUserFriend(friendUsername: string): Promise<any> {
+    return fetchAPI('/friends/add', {
+        method: 'POST',
+        body: JSON.stringify({ friendUsername }),
+    });
+}
+
+export async function acceptUserFriendRequest(friendId: string): Promise<any> {
+    return fetchAPI('/friends/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ friendId: Number(friendId) }),
+    });
+}
+
+export async function removeUserFriend(friendUsername: string): Promise<any> {
+    return fetchAPI('/friends/remove', {
         method: 'DELETE',
+        body: JSON.stringify({ friendUsername }),
     });
 }

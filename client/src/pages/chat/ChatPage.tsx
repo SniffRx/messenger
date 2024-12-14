@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Avatar,
     Box,
@@ -20,25 +20,48 @@ import {
 } from "@mui/icons-material";
 import { Message } from "./components/Message.tsx";
 import { ContentType } from "./components/types.ts";
+import { useParams } from "react-router-dom"; // Добавляем для использования chatId из URL
+import { fetchChatMessages, sendMessage } from "../../api/apiClient"; // Используем реальный вызов API
 
 export function ChatPage() {
-    const [messages, setMessages] = useState(
-        Array.from({ length: 20 }, (_, i) => ({
-            id: i,
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            time: "12:34",
-            own: Math.random() < 0.5,
-            type: (Math.random() < 0.8 ? "text" : "image") as ContentType,
-        }))
-    );
-
+    const { chatId } = useParams(); // Получаем chatId из параметров URL
+    const [messages, setMessages] = useState<{ id: number; text: string; time: string; own: boolean; type: ContentType }[]>([]);
+    const [newMessage, setNewMessage] = useState("");
     const [isVideoCallOpen, setVideoCallOpen] = useState(false);
     const [isScreenShareOpen, setScreenShareOpen] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Загрузка сообщений с сервера при загрузке страницы
+    useEffect(() => {
+        async function fetchMessages() {
+            try {
+                if (chatId) {
+                    const loadedMessages = await fetchChatMessages(chatId); // Загружаем сообщения по chatId
+                    setMessages(loadedMessages);
+                }
+            } catch (err) {
+                setError("Failed to load messages.");
+            }
+        }
+
+        fetchMessages();
+    }, [chatId]);
 
     const handleVideoCall = () => setVideoCallOpen(true);
     const handleScreenShare = () => setScreenShareOpen(true);
     const handleCloseVideoCall = () => setVideoCallOpen(false);
     const handleCloseScreenShare = () => setScreenShareOpen(false);
+
+    const handleSendMessage = async () => {
+        if (newMessage.trim() === "") return;
+        try {
+            await sendMessage(chatId!, newMessage);
+            setMessages([...messages, { text: newMessage, time: new Date().toISOString(), own: true, type: 'text', id: Date.now() }]);
+            setNewMessage("");
+        } catch (err) {
+            setError("Failed to send message.");
+        }
+    };
 
     return (
         <Box
@@ -50,7 +73,14 @@ export function ChatPage() {
                 overflow: "hidden",
             }}
         >
-            {/* Chat Header */}
+            <Box sx={{ flexGrow: 1, overflowY: "auto" }}>
+                {error && <Typography color="error">{error}</Typography>}
+                <Stack spacing={2}>
+                    {messages.map((message) => (
+                        <Message key={message.id} {...message} />
+                    ))}
+                </Stack>
+            </Box>
             <Box
                 sx={{
                     display: "flex",
@@ -128,6 +158,8 @@ export function ChatPage() {
                     placeholder="Write a message..."
                     variant="outlined"
                     size="small"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
                     sx={{
                         borderRadius: "20px",
                         "& .MuiOutlinedInput-root": {
@@ -136,7 +168,7 @@ export function ChatPage() {
                         },
                     }}
                 />
-                <IconButton color="primary">
+                <IconButton color="primary" onClick={handleSendMessage} disabled={!newMessage.trim()}>
                     <Send />
                 </IconButton>
             </Box>
