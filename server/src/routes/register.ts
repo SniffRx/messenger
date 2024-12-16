@@ -4,7 +4,43 @@ import {FastifyInstance} from "fastify";
 import {RegisterRequest} from "./types";
 
 export async function register(server: FastifyInstance){
-    server.post<RegisterRequest>('/register', async (request, reply) => {
+    server.post<RegisterRequest>('/register',
+        {
+            schema: {
+                summary: 'User registration',
+                description: 'Register a new user with email, username, and password.',
+                tags: ['Authentication'],
+                body: {
+                    type: 'object',
+                    required: ['email', 'username', 'password'],
+                    properties: {
+                        email: { type: 'string', format: 'email', description: 'User email' },
+                        username: { type: 'string', description: 'User username' },
+                        password: { type: 'string', description: 'User password' },
+                    },
+                },
+                response: {
+                    201: {
+                        type: 'object',
+                        properties: {
+                            message: { type: 'string', description: 'Success message' },
+                        },
+                    },
+                    400: {
+                        type: 'object',
+                        properties: {
+                            error: { type: 'string', description: 'Error details' },
+                        },
+                    },
+                    500: {
+                        type: 'object',
+                        properties: {
+                            error: { type: 'string', description: 'Internal server error' },
+                        },
+                    },
+                },
+            },
+        }, async (request, reply) => {
         console.log('Received Request Body:', request.body);
 
         // Проверим, что тело запроса не пустое
