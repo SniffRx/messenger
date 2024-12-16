@@ -5,7 +5,7 @@ export interface CreateChatPostRequest {
         Authorization: string;
     };
     Body: {
-        receiverUsername: string;
+        id: number;
     };
 }
 
