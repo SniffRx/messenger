@@ -3,7 +3,7 @@ export interface AddFriendRequest {
         Authorization: string;
     };
     Body: {
-        friendUsername: string;
+        friendId: number;
     };
 }
 
@@ -26,6 +26,12 @@ export interface RemoveFriendRequest {
 }
 
 export interface ShowFriendRequest {
+    Headers: {
+        Authorization: string;
+    };
+}
+
+export interface showFriendRequests {
     Headers: {
         Authorization: string;
     };

@@ -5,7 +5,43 @@ import {RemoveFriendRequest} from "./types";
 export async function removeFriends(server: FastifyInstance)
 {
     // Удаление друга
-    server.delete<RemoveFriendRequest>('/friends/remove', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.delete<RemoveFriendRequest>(
+        '/friends/remove',
+        {
+            onRequest: [server.authenticate],
+            schema: {
+                summary: 'Remove a friend',
+                description: 'Remove an existing friend from the user\'s friend list.',
+                tags: ['Friends'],
+                body: {
+                    type: 'object',
+                    required: ['friendUsername'],
+                    properties: {
+                        friendUsername: { type: 'string', description: 'The username of the friend to remove' },
+                    },
+                },
+                response: {
+                    200: {
+                        type: 'object',
+                        properties: {
+                            message: { type: 'string' },
+                        },
+                    },
+                    400: {
+                        type: 'object',
+                        properties: {
+                            error: { type: 'string' },
+                        },
+                    },
+                    404: {
+                        type: 'object',
+                        properties: {
+                            error: { type: 'string' },
+                        },
+                    },
+                },
+            }
+        }, async (request, reply) => {
         // Проверяем, что тело запроса существует
         if (!request.body) {
             return reply.status(400).send({ error: 'Request body is required' });
