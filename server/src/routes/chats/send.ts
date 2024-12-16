@@ -4,7 +4,82 @@ import {Collection, ObjectId} from "mongodb";
 import {ChatDocument, SendMessageRequest} from "./types";
 
 export async function sendMessage(server: FastifyInstance) {
-    server.post<SendMessageRequest>('/chats/send-message', { onRequest: [server.authenticate] }, async (request, reply) => {
+    server.post<SendMessageRequest>(
+        '/chats/send',
+        {
+            onRequest: [server.authenticate],
+            schema: {
+                summary: 'Send a message in a chat',
+                description: 'Allows an authenticated user to send a message to a chat they are a participant in.',
+                tags: ['Chats'],
+                body: {
+                    type: 'object',
+                    required: ['chatId', 'message'],
+                    properties: {
+                        chatId: {
+                            type: 'string',
+                            description: 'The ID of the chat where the message is being sent'
+                        },
+                        message: {
+                            type: 'string',
+                            description: 'The content of the message'
+                        }
+                    }
+                },
+                response: {
+                    200: {
+                        type: 'object',
+                        properties: {
+                            message: {
+                                type: 'string',
+                                description: 'Success message',
+                                example: 'Message sent successfully'
+                            }
+                        }
+                    },
+                    400: {
+                        type: 'object',
+                        properties: {
+                            error: {
+                                type: 'string',
+                                description: 'Error message for missing or invalid input',
+                                example: 'Chat ID and message are required'
+                            }
+                        }
+                    },
+                    403: {
+                        type: 'object',
+                        properties: {
+                            error: {
+                                type: 'string',
+                                description: 'Error message for unauthorized access',
+                                example: 'You are not a participant in this chat'
+                            }
+                        }
+                    },
+                    404: {
+                        type: 'object',
+                        properties: {
+                            error: {
+                                type: 'string',
+                                description: 'Error message for a non-existent chat',
+                                example: 'Chat not found'
+                            }
+                        }
+                    },
+                    500: {
+                        type: 'object',
+                        properties: {
+                            error: {
+                                type: 'string',
+                                description: 'Error message for internal server errors',
+                                example: 'Internal server error'
+                            }
+                        }
+                    }
+                }
+            },
+        }, async (request, reply) => {
         const { chatId, message } = request.body;
 
         if (!chatId || !message) {

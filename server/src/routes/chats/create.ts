@@ -4,18 +4,46 @@ import {pgpool} from "../../database/postgresql";
 import {CreateChatPostRequest} from "./types";
 
 export async function createChat(server: FastifyInstance) {
-    server.post<CreateChatPostRequest>('/chats/create', {onRequest: [server.authenticate]}, async (request, reply) => {
-        const {receiverUsername} = request.body;
+    server.post<CreateChatPostRequest>('/chats/create', {
+        onRequest: [server.authenticate],
+        schema: {
+            tags: ["Chats"],
+            summary: "Create a private chat",
+            body: {
+                type: "object",
+                properties: {
+                    id: { type: "number" },
+                },
+                required: ["id"],
+            },
+            response: {
+                200: {
+                    type: "object",
+                    properties: {
+                        message: { type: "string" },
+                        chatId: { type: "string" },
+                    }
+                },
+                400: {
+                    type: "object",
+                    properties: {
+                        error: { type: "string" },
+                    }
+                }
+            }
+        }
+    }, async (request, reply) => {
+        const {id} = request.body;
 
-        if (!receiverUsername) {
+        if (!id) {
             return reply.status(400).send({error: 'Receiver username is required'});
         }
 
         try {
-            const {userId} = request.user as { userId: number; username: string; email: string; };
+            const {userId} = request.user as { userId: number;};
 
             // Найти пользователя получателя
-            const receiver = await pgpool.query('SELECT id FROM users WHERE username = $1', [receiverUsername]);
+            const receiver = await pgpool.query('SELECT id FROM users WHERE id = $1', [id]);
             if (receiver.rows.length === 0) {
                 return reply.status(404).send({error: 'Receiver not found'});
             }

@@ -4,7 +4,38 @@ import {pgpool} from "../../database/postgresql";
 import {CreateGroupChatRequest} from "./types";
 
 export async function createGroupChat(server: FastifyInstance) {
-    server.post<CreateGroupChatRequest>('/chats/create-group', {onRequest: [server.authenticate]}, async (request, reply) => {
+    server.post<CreateGroupChatRequest>(
+        '/chats/create-group',
+        {
+            onRequest: [server.authenticate],
+            schema: {
+                tags: ["Chats"],
+                summary: "Create a group chat",
+                body: {
+                    type: "object",
+                    properties: {
+                        participants: { type: "array", items: { type: "string" } },
+                        chatName: { type: "string" },
+                    },
+                    required: ["participants", "chatName"],
+                },
+                response: {
+                    200: {
+                        type: "object",
+                        properties: {
+                            message: { type: "string" },
+                            chatId: { type: "string" },
+                        },
+                    },
+                    400: {
+                        type: "object",
+                        properties: {
+                            error: { type: "string" },
+                        },
+                    },
+                },
+            },
+        }, async (request, reply) => {
         const {participants, chatName} = request.body;
 
         if (!participants || participants.length < 2 || !chatName) {
